@@ -52,7 +52,6 @@ sudo apt-get update
 sudo apt-get install python-dev
 sudo apt-get install python-setuptools
 sudo easy_install -U distribute
-sudo pip install requests==2.6.0
 sudo apt-get install -y python-levenshtein make libmysqlclient-dev python-mysqldb python-pip python-zmq python-numpy gfortran libopenblas-dev liblapack-dev g++ sqlite3 libsqlite3-dev python-sqlite redis-server
 sudo pip install -r requirements.txt
 ```
