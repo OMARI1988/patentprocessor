@@ -114,6 +114,41 @@ def extract_xml_strings(filename):
                 doc = ''
 
 
+def _fix_claims(xml):
+    data = ""
+    flag = 0
+    claim2 = ""
+    for line in xml.split("\n"):
+        if "<claim-text>" in line and "</claim-text>" not in line:
+            flag = 1
+            claim2 = ""
+        if "</claim-text>" in line and "<claim-text>" not in line:
+            flag = 0
+            line = claim2 + line
+            # print ">>>>>>",line
+
+        if flag:
+            line = line.split("\r")[0]
+            if claim2 == "":
+                claim2 = line
+            else:
+                line = line.replace("<claim-text>","",1)
+                line = line.replace("</claim-text>","",1)
+                claim2 += " "+line
+
+        if not flag:
+            if data == "":
+                data = line
+            else:
+                data += "\n"+line
+    # print data
+    return data
+
+def _fix_xml(xml):
+    xml = _fix_claims(xml)
+    return xml
+
+
 def parse_files(filelist, doctype='grant'):
     """
     Takes in a list of patent file names (from __main__() and start.py) and commits
@@ -129,8 +164,13 @@ def parse_files(filelist, doctype='grant'):
     for filename in filelist:
         print filename
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
-            patobj = parse_patent(xmltuple, doctype)
+            # print xmltuple[1]
+            xmltuple_modified = tuple([xmltuple[1], _fix_xml(xmltuple[1])])
+            patobj = parse_patent(xmltuple_modified, doctype)
+            # print patobj
             if doctype == 'grant':
+                # print patobj.claims
+                # print ">>>>>>>>>>>>>>>>>>>",patobj.claims[0]["text"]
                 alchemy.add_grant(patobj)
                 commit = alchemy.commit
             else:
@@ -140,6 +180,7 @@ def parse_files(filelist, doctype='grant'):
                 commit()
                 logging.info("{0} - {1} - {2}".format(filename, (i+1), datetime.datetime.now()))
                 print " *", (i+1), datetime.datetime.now()
+            # break
         commit()
         print " *", "Complete", datetime.datetime.now()
 
@@ -154,6 +195,7 @@ def parse_patent(xmltuple, doctype='grant'):
         return
     try:
         date, xml = xmltuple  # extract out the parts of the tuple
+        # print xml
         patent = _get_parser(date, doctype).Patent(xml, True)
     except Exception as inst:
         logging.error(inst)
