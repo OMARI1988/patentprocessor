@@ -85,6 +85,7 @@ def _get_parser(date, doctype='grant'):
     to parse it
     """
     xmlhandlers = get_xml_handlers('process.cfg', doctype)
+    # print ">>>>>>>>>>>>>>>>",xmlhandlers
     for daterange in xmlhandlers.iterkeys():
         if daterange[0] <= date <= daterange[1]:
             return xmlhandlers[daterange]
@@ -144,6 +145,7 @@ def _fix_claims(xml):
     # print data
     return data
 
+
 def _fix_xml(xml):
     xml = _fix_claims(xml)
     return xml
@@ -165,11 +167,11 @@ def parse_files(filelist, doctype='grant'):
         print filename
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
             # print xmltuple[1]
-            xmltuple_modified = tuple([xmltuple[1], _fix_xml(xmltuple[1])])
+            xmltuple_modified = tuple([xmltuple[0], _fix_xml(xmltuple[1])])
             patobj = parse_patent(xmltuple_modified, doctype)
             # print patobj
             if doctype == 'grant':
-                # print patobj.claims
+                # print patobj.pat
                 # print ">>>>>>>>>>>>>>>>>>>",patobj.claims[0]["text"]
                 alchemy.add_grant(patobj)
                 commit = alchemy.commit
@@ -180,7 +182,7 @@ def parse_files(filelist, doctype='grant'):
                 commit()
                 logging.info("{0} - {1} - {2}".format(filename, (i+1), datetime.datetime.now()))
                 print " *", (i+1), datetime.datetime.now()
-            # break
+            break
         commit()
         print " *", "Complete", datetime.datetime.now()
 
@@ -195,8 +197,8 @@ def parse_patent(xmltuple, doctype='grant'):
         return
     try:
         date, xml = xmltuple  # extract out the parts of the tuple
-        # print xml
         patent = _get_parser(date, doctype).Patent(xml, True)
+        # print patent.abstract
     except Exception as inst:
         logging.error(inst)
         logging.error("  - Error parsing patent: %s" % (xml[:400]))
@@ -231,31 +233,31 @@ def mark_granted():
     appsession = appsessiongen()
     bulk_commit_updates('granted', granted_apps, alchemy.schema.App_Application.__table__, alchemy.is_mysql(), 20000, 'application')
 
-def main(patentroot, xmlregex, verbosity, output_directory='.', doctype='grant'):
-    logfile = "./" + 'xml-parsing.log'
-    logging.basicConfig(filename=logfile, level=verbosity)
-
-    logging.info("Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()), patentroot))
-    files = list_files(patentroot, xmlregex)
-
-    logging.info("Found all files matching {0} in directory {1}".format(xmlregex, patentroot))
-    parse_files(files, doctype)
-    move_tables(output_directory)
-
-    logging.info("SQL tables moved to {0}".format(output_directory))
-    logging.info("Parse completed at {0}".format(str(datetime.datetime.today())))
-
-    logging.info("Marking granted applications")
-    mark_granted()
-
-
-if __name__ == '__main__':
-    args = argconfig_parse.ArgHandler(sys.argv[1:])
-
-    XMLREGEX = args.get_xmlregex()
-    PATENTROOT = args.get_patentroot()
-    VERBOSITY = args.get_verbosity()
-    PATENTOUTPUTDIR = args.get_output_directory()
-    DOCUMENTTYPE = args.get_document_type()
-
-    main(PATENTROOT, XMLREGEX, VERBOSITY, PATENTOUTPUTDIR, DOCUMENTTYPE)
+# def main(patentroot, xmlregex, verbosity, output_directory='.', doctype='grant'):
+#     logfile = "./" + 'xml-parsing.log'
+#     logging.basicConfig(filename=logfile, level=verbosity)
+#
+#     logging.info("Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()), patentroot))
+#     files = list_files(patentroot, xmlregex)
+#
+#     logging.info("Found all files matching {0} in directory {1}".format(xmlregex, patentroot))
+#     parse_files(files, doctype)
+#     move_tables(output_directory)
+#
+#     logging.info("SQL tables moved to {0}".format(output_directory))
+#     logging.info("Parse completed at {0}".format(str(datetime.datetime.today())))
+#
+#     logging.info("Marking granted applications")
+#     mark_granted()
+#
+#
+# if __name__ == '__main__':
+#     args = argconfig_parse.ArgHandler(sys.argv[1:])
+#
+#     XMLREGEX = args.get_xmlregex()
+#     PATENTROOT = args.get_patentroot()
+#     VERBOSITY = args.get_verbosity()
+#     PATENTOUTPUTDIR = args.get_output_directory()
+#     DOCUMENTTYPE = args.get_document_type()
+#
+#     main(PATENTROOT, XMLREGEX, VERBOSITY, PATENTOUTPUTDIR, DOCUMENTTYPE)

@@ -161,21 +161,21 @@ if __name__=='__main__':
     doctype = process_config['doctype']
 
     # download the files to be parsed
-    urls = []
+    # urls = []
     should_process_grants = doctype in ['all', 'grant']
     should_process_applications = doctype in ['all', 'application']
-    if should_process_grants:
-        urls += generate_download_list(parse_config['years'], 'grant')
-    if should_process_applications:
-        urls += generate_download_list(parse_config['years'], 'application')
-    downloaddir = parse_config['downloaddir']
-    if downloaddir and not os.path.exists(downloaddir):
-        os.makedirs(downloaddir)
-    print 'Downloading files at {0}'.format(str(datetime.datetime.today()))
-    download_files(urls)
-    print 'Downloaded files:',parse_config['years']
-    f = datetime.datetime.now()
-    print 'Finished downloading in {0}'.format(str(f-s))
+    # if should_process_grants:
+    #     urls += generate_download_list(parse_config['years'], 'grant')
+    # if should_process_applications:
+    #     urls += generate_download_list(parse_config['years'], 'application')
+    # downloaddir = parse_config['downloaddir']
+    # if downloaddir and not os.path.exists(downloaddir):
+    #     os.makedirs(downloaddir)
+    # print 'Downloading files at {0}'.format(str(datetime.datetime.today()))
+    # download_files(urls)
+    # print 'Downloaded files:',parse_config['years']
+    # f = datetime.datetime.now()
+    # print 'Finished downloading in {0}'.format(str(f-s))
 
     # find files
     print "Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()),parse_config['datadir'])

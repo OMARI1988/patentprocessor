@@ -242,6 +242,7 @@ def add_all_fields(obj, pat):
     add_ipcr(obj, pat)
     add_citations(obj, pat)
     add_claims(obj, pat)
+    add_description(obj, pat)
 
 
 def add_asg(obj, pat):
@@ -333,6 +334,12 @@ def add_claims(obj, pat):
         clm = schema.Claim(**claim)
         pat.claims.append(clm)
 
+def add_description(obj, pat):
+    descriptions = obj.descriptions
+    for desc in descriptions:
+        desc = fixid(desc)
+        clm = schema.Description(**desc)
+        pat.descriptions.append(clm)
 
 def commit():
     try:

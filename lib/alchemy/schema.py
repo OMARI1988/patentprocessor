@@ -111,6 +111,7 @@ class Patent(GrantBase):
     rawinventors = relationship("RawInventor", backref="patent", cascade=cascade)
     rawlawyers = relationship("RawLawyer", backref="patent", cascade=cascade)
     claims = relationship("Claim", backref="patent", cascade=cascade)
+    descriptions = relationship("Description", backref="patent", cascade=cascade)
     uspatentcitations = relationship(
         "USPatentCitation",
         primaryjoin="Patent.id == USPatentCitation.patent_id",
@@ -975,6 +976,17 @@ class Claim(GrantBase):
     def __repr__(self):
         return "<Claim('{0}')>".format(self.text)
 
+class Description(GrantBase):
+    __tablename__ = "description"
+    uuid = Column(Unicode(36), primary_key=True)
+    patent_id = Column(Unicode(20), ForeignKey('patent.id'))
+    text = deferred(Column(UnicodeText))
+    # dependent = Column(Integer) # if -1, independent
+    # sequence = Column(Integer, index=True)
+
+    def __repr__(self):
+        return "<Description('{0}')>".format(self.text)
+
 ## Application Tables
 
 # ASSOCIATION ----------------------
@@ -1022,6 +1034,7 @@ class App_Application(ApplicationBase):
     rawassignees = relationship("App_RawAssignee", backref="application", cascade=cascade)
     rawinventors = relationship("App_RawInventor", backref="application", cascade=cascade)
     claims = relationship("App_Claim", backref="application", cascade=cascade)
+    descriptions = relationship("App_Descriotion", backref="application", cascade=cascade)
     assignees = relationship("App_Assignee", secondary=applicationassignee, backref="applications")
     inventors = relationship("App_Inventor", secondary=applicationinventor, backref="applications")
 
@@ -1587,3 +1600,14 @@ class App_Claim(ApplicationBase):
 
     def __repr__(self):
         return "<Claim('{0}')>".format(self.text)
+
+class App_Descriotion(ApplicationBase):
+    __tablename__ = "description"
+    uuid = Column(Unicode(36), primary_key=True)
+    application_id = Column(Unicode(20), ForeignKey('application.id'))
+    text = deferred(Column(UnicodeText))
+    #dependent = Column(Integer) # if -1, independent
+    #sequence = Column(Integer, index=True)
+
+    def __repr__(self):
+        return "<Description('{0}')>".format(self.text)
