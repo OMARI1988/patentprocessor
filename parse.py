@@ -164,7 +164,7 @@ def parse_files(filelist, doctype='grant'):
         return
     commit = alchemy.commit
     for filename in filelist:
-        print filename
+        # print filename
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
             # print xmltuple[1]
             xmltuple_modified = tuple([xmltuple[0], _fix_xml(xmltuple[1])])
@@ -182,7 +182,7 @@ def parse_files(filelist, doctype='grant'):
                 commit()
                 logging.info("{0} - {1} - {2}".format(filename, (i+1), datetime.datetime.now()))
                 print " *", (i+1), datetime.datetime.now()
-            break
+            # break
         commit()
         print " *", "Complete", datetime.datetime.now()
 
