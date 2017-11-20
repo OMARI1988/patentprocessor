@@ -63,7 +63,7 @@ class Patent(PatentHandler):
 
         self.attributes = ['pat','app','assignee_list','patent','inventor_list','lawyer_list',
                      'us_relation_list','us_classifications','ipcr_classifications',
-                     'citation_list','claims']
+                     'citation_list','claims','descriptions']
 
         self.xml = xh.root.us_patent_grant
 
@@ -450,6 +450,32 @@ class Patent(PatentHandler):
                 # claim_refs are 'claim N', so we extract the N
                 data['dependent'] = int(claim.contents_of('claim_ref',\
                                         as_string=True).split(' ')[-1])
+            data['uuid'] = str(uuid.uuid1())
+            res.append(data)
+        return res
+
+    @property
+    def descriptions(self):
+        """
+        Returns list of dictionaries representing claims
+        claim:
+          text
+          dependent -- -1 if an independent claim, else this is the number
+                       of the claim this one is dependent on
+          sequence
+        """
+        descriptions = self.xml.description
+        res = []
+        for i, desc in enumerate(descriptions):
+            data = {}
+            data['text'] = desc.contents_of('p', as_string=True, upper=False)
+            # remove leading claim num from text
+            # data['text'] = claim_num_regex.sub('', data['text'])
+            # data['sequence'] = i+1 # claims are 1-indexed
+            # if claim.claim_ref:
+            #     # claim_refs are 'claim N', so we extract the N
+            #     data['dependent'] = int(claim.contents_of('claim_ref',\
+            #                             as_string=True).split(' ')[-1])
             data['uuid'] = str(uuid.uuid1())
             res.append(data)
         return res

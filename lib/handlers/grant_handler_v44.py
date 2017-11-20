@@ -465,12 +465,12 @@ class Patent(PatentHandler):
                        of the claim this one is dependent on
           sequence
         """
-        claims = self.xml.description
+        descriptions = self.xml.description
         res = []
-        for i, claim in enumerate(claims):
+        for i, desc in enumerate(descriptions):
             # print claim.contents_of('p', as_string=True, upper=False)
             data = {}
-            data['text'] = claim.contents_of('p', as_string=True, upper=False)
+            data['text'] = desc.contents_of('p', as_string=True, upper=False)
             # print data["text"]
             # remove leading claim num from text
             # data['text'] = claim_num_regex.sub('', data['text'])

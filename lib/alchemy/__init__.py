@@ -335,6 +335,7 @@ def add_claims(obj, pat):
         pat.claims.append(clm)
 
 def add_description(obj, pat):
+    # print obj.descriptions
     descriptions = obj.descriptions
     for desc in descriptions:
         desc = fixid(desc)
