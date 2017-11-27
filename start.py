@@ -125,7 +125,7 @@ def download_files(urls):
             continue
     return complete
 
-def run_parse(files, doctype='grant'):
+def run_parse(files, patentroot, doctype='grant'):
     import parse
     import time
     import sys
@@ -134,7 +134,7 @@ def run_parse(files, doctype='grant'):
     import logging
     logfile = "./" + 'xml-parsing.log'
     logging.basicConfig(filename=logfile, level=logging.DEBUG)
-    parse.parse_files(files, doctype)
+    parse.parse_files(files,patentroot, doctype)
 
 def run_clean(process_config):
     if not process_config['clean']:
@@ -179,17 +179,18 @@ if __name__=='__main__':
 
     # find files
     print "Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()),parse_config['datadir'])
+    patentroot = parse_config['datadir']
     if should_process_grants:
-        files = parse.list_files(parse_config['datadir'],parse_config['grantregex'])
+        files = parse.list_files(patentroot, parse_config['grantregex'])
         print 'Running grant parse...'
-        run_parse(files, 'grant')
+        run_parse(files, patentroot, 'grant')
         f = datetime.datetime.now()
         print "Found {2} files matching {0} in directory {1}"\
                 .format(parse_config['grantregex'], parse_config['datadir'], len(files))
     if should_process_applications:
         files = parse.list_files(parse_config['datadir'],parse_config['applicationregex'])
         print 'Running application parse...'
-        run_parse(files, 'application')
+        run_parse(files, patentroot, 'application')
         f = datetime.datetime.now()
         print "Found {2} files matching {0} in directory {1}"\
                 .format(parse_config['applicationregex'], parse_config['datadir'], len(files))

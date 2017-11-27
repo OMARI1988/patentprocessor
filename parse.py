@@ -47,6 +47,7 @@ import lib.alchemy as alchemy
 import shutil
 from lib.config_parser import get_xml_handlers
 from lib.alchemy.match import commit_inserts, commit_updates
+import pickle
 
 logfile = "./" + 'xml-parsing.log'
 logging.basicConfig(filename=logfile, level=logging.DEBUG)
@@ -151,7 +152,16 @@ def _fix_xml(xml):
     return xml
 
 
-def parse_files(filelist, doctype='grant'):
+def _load_processed_files(patentroot):
+    if os.path.isfile(patentroot+'processed_files.p'):
+        processed_files = pickle.load(open(patentroot+'processed_files.p', 'rb'))
+    else:
+        processed_files = []
+        pickle.dump(processed_files, open(patentroot+'processed_files.p', 'wb'))
+    return processed_files
+
+
+def parse_files(filelist, patentroot, doctype='grant'):
     """
     Takes in a list of patent file names (from __main__() and start.py) and commits
     them to the database. This method is designed to be used sequentially to
@@ -160,11 +170,18 @@ def parse_files(filelist, doctype='grant'):
     If set to 0, it will commit after all patobjects have been added.  Setting
     `commit_frequency` to be low (but not 0) is helpful for low memory machines.
     """
+    processed_files = _load_processed_files(patentroot)
     if not filelist:
         return
     commit = alchemy.commit
     for filename in filelist:
-        # print filename
+        file_text = filename.split(".")[0].split("/")[-1]
+        if file_text in processed_files:
+            print file_text, "already processed"
+            continue
+        else:
+            print "processing",file_text
+
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
             # print xmltuple[1]
             xmltuple_modified = tuple([xmltuple[0], _fix_xml(xmltuple[1])])
@@ -182,8 +199,9 @@ def parse_files(filelist, doctype='grant'):
                 commit()
                 logging.info("{0} - {1} - {2}".format(filename, (i+1), datetime.datetime.now()))
                 print " *", (i+1), datetime.datetime.now()
-            # break
         commit()
+        processed_files.append(file_text)
+        pickle.dump(processed_files, open(patentroot+'processed_files.p', 'wb'))
         print " *", "Complete", datetime.datetime.now()
 
 
