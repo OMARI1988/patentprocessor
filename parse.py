@@ -183,13 +183,12 @@ def parse_files(filelist, patentroot, doctype='grant'):
             print "processing",file_text
 
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
-            # print xmltuple[1]
+            if i % 10 == 0:
+                print i, datetime.datetime.now()
+
             xmltuple_modified = tuple([xmltuple[0], _fix_xml(xmltuple[1])])
             patobj = parse_patent(xmltuple_modified, doctype)
-            # print patobj
             if doctype == 'grant':
-                # print patobj.pat
-                # print ">>>>>>>>>>>>>>>>>>>",patobj.claims[0]["text"]
                 alchemy.add_grant(patobj)
                 commit = alchemy.commit
             else:
