@@ -208,15 +208,16 @@ def add_grant(obj, override=True, temp=False):
     """
 
     # if a patent exists, remove it so we can replace it
-    (patent_exists, ), = grantsession.query(exists().where(schema.Patent.number == obj.patent))
-    #pat_query = grantsession.query(Patent).filter(Patent.number == obj.patent)
-    #if pat_query.count():
-    if patent_exists:
-        if override:
-            pat_query = grantsession.query(schema.Patent).filter(schema.Patent.id == obj.patent)
-            grantsession.delete(pat_query.one())
-        else:
-            return
+    # (patent_exists, ), = grantsession.query(exists().where(schema.Patent.number == obj.patent))
+    # # print "ttt2"
+    # #pat_query = grantsession.query(Patent).filter(Patent.number == obj.patent)
+    # #if pat_query.count():
+    # if patent_exists:
+    #     if override:
+    #         pat_query = grantsession.query(schema.Patent).filter(schema.Patent.id == obj.patent)
+    #         grantsession.delete(pat_query.one())
+    #     else:
+    #         return
     if len(obj.pat["number"]) < 3:
         return
 
@@ -228,10 +229,8 @@ def add_grant(obj, override=True, temp=False):
         grantsession.execute('set foreign_key_checks = 0;')
         grantsession.execute('set unique_checks = 0;')
 
-    #grantsession.commit()
-
+    # grantsession.commit()
     grantsession.merge(pat)
-
 
 def add_all_fields(obj, pat):
     add_asg(obj, pat)
