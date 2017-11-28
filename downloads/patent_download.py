@@ -28,9 +28,10 @@ def main(argv):
     downloadDir ='/media/ftg/My Book Duo/patents/'+argv[0]+'/'
     os.chdir(downloadDir)
 
-    files = glob.glob(downloadDir+'*.xml')
+    files = glob.glob(downloadDir+'*.zip')
     for i,file in enumerate(files):
-        files[i] = file.split(".")[0].split("/")[-1]
+        files[i] = file.split(".")[0].split("_")[-1]
+    # print files
 
     for a in soup.find_all('a', href=True):
         if a['href'][27:31] == yearToDownload:
