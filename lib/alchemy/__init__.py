@@ -155,7 +155,7 @@ def session_generator(db=None, dbtype='grant'):
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
 
-def fetch_session(db=None, dbtype='grant', year=""):
+def fetch_session(db=None, dbtype='grant', year="", week=""):
     """
     Read from config.ini file and load appropriate database
 
@@ -170,9 +170,9 @@ def fetch_session(db=None, dbtype='grant', year=""):
         db = config.get('global').get('database')
     if db[:6] == "sqlite":
         if dbtype == "grant":
-            sqlite_db_path = "./grant_"+year+".db"
+            sqlite_db_path = "/home/ftg/patents/extracted/grant_"+year+"_"+week+".db"
         if dbtype == "application":
-            sqlite_db_path = "./application_"+year+".db"
+            sqlite_db_path = "/home/ftg/patents/extracted/application_"+year+"_"+week+".db"
         # sqlite_db_path = os.path.join(
         #     config.get(db).get('path'),
         #     config.get(db).get('{0}-database'.format(dbtype)))
@@ -458,8 +458,8 @@ def commit_application():
         appsession.rollback()
         print str(e)
 
-def create_sessions(year):
+def create_sessions(year, week):
     global grantsession, appsession, session
-    grantsession = fetch_session(dbtype='grant', year=year)
-    appsession = fetch_session(dbtype='application', year=year)
+    grantsession = fetch_session(dbtype='grant', year=year, week=week)
+    appsession = fetch_session(dbtype='application', year=year, week=week)
     session = grantsession # default for clean and consolidate

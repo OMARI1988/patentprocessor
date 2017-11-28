@@ -125,7 +125,7 @@ def download_files(urls):
             continue
     return complete
 
-def run_parse(files, patentroot, doctype='grant'):
+def run_parse(files, patentroot, doctype='grant', year="year"):
     import parse
     import time
     import sys
@@ -135,7 +135,7 @@ def run_parse(files, patentroot, doctype='grant'):
     files = reversed(sorted(files))
     logfile = "./" + 'xml-parsing.log'
     logging.basicConfig(filename=logfile, level=logging.DEBUG)
-    parse.parse_files(files,patentroot, doctype)
+    parse.parse_files(files,patentroot, doctype, year)
 
 def run_clean(process_config):
     if not process_config['clean']:
@@ -161,7 +161,7 @@ def main(argv):
         sys.exit(2)
 
     s = datetime.datetime.now()
-    alchemy.create_sessions(year)
+    # alchemy.create_sessions(year)
     # accepts path to configuration file as command line option
     # if len(sys.argv) < 2:
     #     print('Please specify a configuration file as the first argument')
@@ -192,14 +192,14 @@ def main(argv):
     if should_process_grants:
         files = parse.list_files(patentroot, parse_config['grantregex'])
         print 'Running grant parse...'
-        run_parse(files, patentroot, 'grant')
+        run_parse(files, patentroot, 'grant', year)
         f = datetime.datetime.now()
         print "Found {2} files matching {0} in directory {1}"\
                 .format(parse_config['grantregex'], parse_config['datadir'], len(files))
     if should_process_applications:
         files = parse.list_files(parse_config['datadir'],parse_config['applicationregex'])
         print 'Running application parse...'
-        run_parse(files, patentroot, 'application')
+        run_parse(files, patentroot, 'application', year)
         f = datetime.datetime.now()
         print "Found {2} files matching {0} in directory {1}"\
                 .format(parse_config['applicationregex'], parse_config['datadir'], len(files))

@@ -161,7 +161,7 @@ def _load_processed_files(patentroot):
     return processed_files
 
 
-def parse_files(filelist, patentroot, doctype='grant'):
+def parse_files(filelist, patentroot, doctype='grant', year=""):
     """
     Takes in a list of patent file names (from __main__() and start.py) and commits
     them to the database. This method is designed to be used sequentially to
@@ -173,9 +173,10 @@ def parse_files(filelist, patentroot, doctype='grant'):
     processed_files = _load_processed_files(patentroot)
     if not filelist:
         return
-    commit = alchemy.commit
     for filename in filelist:
         file_text = filename.split(".")[0].split("/")[-1]
+        alchemy.create_sessions(year, file_text)
+        commit = alchemy.commit
         if file_text in processed_files:
             print file_text, "already processed"
             continue
@@ -240,6 +241,7 @@ def move_tables(output_directory):
     except:
         print 'Database file {0} does not exist'.format(dbfile)
 
+
 def mark_granted():
     from lib.tasks import bulk_commit_updates
     grantsessiongen = alchemy.session_generator(dbtype='grant')
@@ -249,6 +251,7 @@ def mark_granted():
 
     appsession = appsessiongen()
     bulk_commit_updates('granted', granted_apps, alchemy.schema.App_Application.__table__, alchemy.is_mysql(), 20000, 'application')
+
 
 # def main(patentroot, xmlregex, verbosity, output_directory='.', doctype='grant'):
 #     logfile = "./" + 'xml-parsing.log'
