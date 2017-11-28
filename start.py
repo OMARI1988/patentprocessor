@@ -132,6 +132,7 @@ def run_parse(files, patentroot, doctype='grant'):
     import itertools
     import lib.alchemy as alchemy
     import logging
+    files = reversed(sorted(files))
     logfile = "./" + 'xml-parsing.log'
     logging.basicConfig(filename=logfile, level=logging.DEBUG)
     parse.parse_files(files,patentroot, doctype)
