@@ -61,3 +61,9 @@ sudo pip install -r requirements.txt
 ```
 python start.py process.cfg
 ```
+
+## download files by year
+
+```
+python downloads/patent_download.py 2007
+```
