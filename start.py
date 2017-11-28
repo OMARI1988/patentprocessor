@@ -152,13 +152,21 @@ def run_consolidate(process_config):
     command = 'bash run_consolidation.sh'
     os.system(command)
 
-if __name__=='__main__':
+def main(argv):
+    try:
+        year = argv[0]
+        print 'processing all of',argv[0]
+    except:
+        print 'enter a year to process, e.g. python start.py 2010'
+        sys.exit(2)
+
     s = datetime.datetime.now()
+    alchemy.create_sessions(year)
     # accepts path to configuration file as command line option
-    if len(sys.argv) < 2:
-        print('Please specify a configuration file as the first argument')
-        exit()
-    process_config, parse_config = get_config_options(sys.argv[1])
+    # if len(sys.argv) < 2:
+    #     print('Please specify a configuration file as the first argument')
+    #     exit()
+    process_config, parse_config = get_config_options("process.cfg")
     doctype = process_config['doctype']
 
     # download the files to be parsed
@@ -180,7 +188,7 @@ if __name__=='__main__':
 
     # find files
     print "Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()),parse_config['datadir'])
-    patentroot = parse_config['datadir']
+    patentroot = parse_config['datadir']+year+"/"
     if should_process_grants:
         files = parse.list_files(patentroot, parse_config['grantregex'])
         print 'Running grant parse...'
@@ -200,3 +208,6 @@ if __name__=='__main__':
     # run extra phases if needed
     run_clean(process_config)
     run_consolidate(process_config)
+
+if __name__=='__main__':
+    main(sys.argv[1:])

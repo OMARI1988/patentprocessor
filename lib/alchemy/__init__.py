@@ -44,6 +44,7 @@ import uuid
 from sqlalchemy import exc
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
+global grantsession, appsession, session
 
 def fixid(x):
     if 'id' in x:
@@ -154,7 +155,7 @@ def session_generator(db=None, dbtype='grant'):
     Session = sessionmaker(bind=engine, _enable_transaction_accounting=False)
     return scoped_session(Session)
 
-def fetch_session(db=None, dbtype='grant'):
+def fetch_session(db=None, dbtype='grant', year=""):
     """
     Read from config.ini file and load appropriate database
 
@@ -163,13 +164,18 @@ def fetch_session(db=None, dbtype='grant'):
              the grant database or the application database
     """
     config = get_config()
+    # year =
     echo = config.get('global').get('echo')
     if not db:
         db = config.get('global').get('database')
     if db[:6] == "sqlite":
-        sqlite_db_path = os.path.join(
-            config.get(db).get('path'),
-            config.get(db).get('{0}-database'.format(dbtype)))
+        if dbtype == "grant":
+            sqlite_db_path = "./grant_"+year+".db"
+        if dbtype == "application":
+            sqlite_db_path = "./application_"+year+".db"
+        # sqlite_db_path = os.path.join(
+        #     config.get(db).get('path'),
+        #     config.get(db).get('{0}-database'.format(dbtype)))
         engine = create_engine('sqlite:///{0}'.format(sqlite_db_path), echo=echo)
     else:
         engine = create_engine('mysql+mysqldb://{0}:{1}@{2}/{3}?charset=utf8'.format(
@@ -245,6 +251,7 @@ def add_all_fields(obj, pat):
 
 
 def add_asg(obj, pat):
+    global grantsession, appsession, session
     for asg, loc in obj.assignee_list:
         asg = fixid(asg)
         loc = fixid(loc)
@@ -256,6 +263,7 @@ def add_asg(obj, pat):
 
 
 def add_inv(obj, pat):
+    global grantsession, appsession, session
     for inv, loc in obj.inventor_list:
         inv = fixid(inv)
         loc = fixid(loc)
@@ -282,6 +290,7 @@ def add_usreldoc(obj, pat):
 
 
 def add_classes(obj, pat):
+    global grantsession, appsession, session
     for uspc, mc, sc in obj.us_classifications:
         uspc = fixid(uspc)
         uspc = schema.USPC(**uspc)
@@ -342,6 +351,7 @@ def add_description(obj, pat):
         pat.descriptions.append(clm)
 
 def commit():
+    global grantsession, appsession, session
     try:
         grantsession.commit()
     except Exception, e:
@@ -448,6 +458,8 @@ def commit_application():
         appsession.rollback()
         print str(e)
 
-grantsession = fetch_session(dbtype='grant')
-appsession = fetch_session(dbtype='application')
-session = grantsession # default for clean and consolidate
+def create_sessions(year):
+    global grantsession, appsession, session
+    grantsession = fetch_session(dbtype='grant', year=year)
+    appsession = fetch_session(dbtype='application', year=year)
+    session = grantsession # default for clean and consolidate
