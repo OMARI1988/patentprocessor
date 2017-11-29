@@ -58,8 +58,9 @@ sudo pip install -r requirements.txt
 
 ## run the first test
 
+we now process files by year and create a different db per week
 ```
-python start.py process.cfg
+python start.py 2010
 ```
 
 ## download files by year
