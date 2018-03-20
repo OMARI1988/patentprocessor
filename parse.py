@@ -120,14 +120,32 @@ def _fix_claims(xml):
     data = ""
     flag = 0
     claim2 = ""
+    sym1 = "<claim-ref idref=\"CLM-"
     for line in xml.split("\n"):
+        ## this if statement to keep the claim referece in text
+        if 'claim-ref' in line:
+            # print "======",line
+            while 1:
+                if sym1 not in line:
+                    line = line.replace(" <$claim-ref idref=\"CLM-"," <claim-ref idref=\"CLM-",-1)
+                    # print ">>>>>>",line
+                    break
+                else:
+                    # print "**********************",len(line.split(sym1))
+                    split = line.split(sym1)
+                    a = split[0]
+                    b = split[1]
+                    other = sym1.join(split[1:])
+                    cl,c = b.split("</claim-ref>")
+                    line = split[0]+" "+cl[7:]+" <$claim-ref idref=\"CLM-"+other
+                    line = line.replace("  "," ",-1)
+                    # print "++++++",line
         if "<claim-text>" in line and "</claim-text>" not in line:
             flag = 1
             claim2 = ""
         if "</claim-text>" in line and "<claim-text>" not in line:
             flag = 0
             line = claim2 + line
-            # print ">>>>>>",line
 
         if flag:
             line = line.split("\r")[0]
@@ -184,9 +202,14 @@ def parse_files(filelist, patentroot, doctype='grant', year=""):
             print "processing",file_text
 
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
-            if i % 10 == 0:
+            # #NOTE REMOVE ME
+            # if i < 400:
+            #     continue
+            if i % 50 == 0:
                 print i, datetime.datetime.now()
-
+            # for line in _fix_xml(xmltuple[1]).split("\n"):
+            #     if 'claim-ref' in line:
+            #         print line
             xmltuple_modified = tuple([xmltuple[0], _fix_xml(xmltuple[1])])
             patobj = parse_patent(xmltuple_modified, doctype)
             if doctype == 'grant':

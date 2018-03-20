@@ -161,30 +161,11 @@ def main(argv):
         sys.exit(2)
 
     s = datetime.datetime.now()
-    # alchemy.create_sessions(year)
-    # accepts path to configuration file as command line option
-    # if len(sys.argv) < 2:
-    #     print('Please specify a configuration file as the first argument')
-    #     exit()
     process_config, parse_config = get_config_options("process.cfg")
     doctype = process_config['doctype']
 
-    # download the files to be parsed
-    # urls = []
     should_process_grants = doctype in ['all', 'grant']
     should_process_applications = doctype in ['all', 'application']
-    # if should_process_grants:
-    #     urls += generate_download_list(parse_config['years'], 'grant')
-    # if should_process_applications:
-    #     urls += generate_download_list(parse_config['years'], 'application')
-    # downloaddir = parse_config['downloaddir']
-    # if downloaddir and not os.path.exists(downloaddir):
-    #     os.makedirs(downloaddir)
-    # print 'Downloading files at {0}'.format(str(datetime.datetime.today()))
-    # download_files(urls)
-    # print 'Downloaded files:',parse_config['years']
-    # f = datetime.datetime.now()
-    # print 'Finished downloading in {0}'.format(str(f-s))
 
     # find files
     print "Starting parse on {0} on directory {1}".format(str(datetime.datetime.today()),parse_config['datadir'])
