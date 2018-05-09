@@ -58,6 +58,8 @@ sudo pip install -r requirements.txt
 
 ## run the first test
 
+You have to unzim the patent files manually.
+
 we now process files by year and create a different db per week
 ```
 python start.py 2010
