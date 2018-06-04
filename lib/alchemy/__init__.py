@@ -170,7 +170,20 @@ def fetch_session(db='sqlite', dbtype='grant', year="", week=""):
         db = config.get('global').get('database')
     if db[:6] == "sqlite":
         if dbtype == "grant":
-            sqlite_db_path = "/media/mo/Data1/patents/extracted/grant_"+year+"_"+week+".db"
+            if os.path.isdir("/media/mo/Data1/patents/extracted/"):
+                if not os.path.isdir("/media/mo/Data1/patents/extracted"):
+                    os.mkdir("/media/mo/Data1/patents/extracted")
+                sqlite_db_path = "/media/mo/Data1/patents/extracted/grant_"+year+"_"+week+".db"
+
+            elif os.path.isdir("/home/mo/Data1/patents/"):
+                if not os.path.isdir("/home/mo/Data1/patents/extracted"):
+                    os.mkdir("/home/mo/Data1/patents/extracted")
+                sqlite_db_path = "/home/mo/Data1/patents/extracted/grant_"+year+"_"+week+".db"
+
+            else:
+                print "################################ Error"
+                print ">>>>>>>>> you have a path issue, check Python/patentprocessor/lib/alchemy/__init__.py"
+                print "######################################"
         # if dbtype == "application":
         #     sqlite_db_path = "/home/ftg/patents/extracted/application_"+year+"_"+week+".db"
         # sqlite_db_path = os.path.join(
