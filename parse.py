@@ -122,6 +122,7 @@ def _fix_claims(xml):
     claim2 = ""
     sym1 = "<claim-ref idref=\"CLM-"
     for line in xml.split("\n"):
+        # print line
         ## this if statement to keep the claim referece in text
         if 'claim-ref' in line:
             # print "======",line
@@ -140,7 +141,7 @@ def _fix_claims(xml):
                     line = split[0]+" "+cl[7:]+" <$claim-ref idref=\"CLM-"+other
                     line = line.replace("  "," ",-1)
                     # print "++++++",line
-        if "<claim-text>" in line and "</claim-text>" not in line:
+        if "<claim-text>" in line and "</claim-text>" not in line and not flag:
             flag = 1
             claim2 = ""
         if "</claim-text>" in line and "<claim-text>" not in line:
@@ -155,12 +156,15 @@ def _fix_claims(xml):
                 line = line.replace("<claim-text>","",1)
                 line = line.replace("</claim-text>","",1)
                 claim2 += " "+line
+            # print claim2
 
         if not flag:
             if data == "":
                 data = line
             else:
                 data += "\n"+line
+            # print claim2
+            # print "--------------------------------------"
     # print data
     return data
 
@@ -203,7 +207,7 @@ def parse_files(filelist, patentroot, doctype='grant', year=""):
 
         for i, xmltuple in enumerate(extract_xml_strings(filename)):
             # #NOTE REMOVE ME
-            # if i < 400:
+            # if i != 676:
             #     continue
             if i % 50 == 0:
                 print i, datetime.datetime.now()
